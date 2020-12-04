@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -27,7 +28,12 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.Calendar;
+import java.util.Date;
 
 
 public class MapsActivity extends FragmentActivity implements LocationListener {
@@ -45,14 +51,48 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     protected String latitude,longitude;
     protected boolean gps_enabled,network_enabled;
 
+    // reference to Button
+    Button btn_StartSession;
+    Button btn_GetSession;
+
+    // DAO initialization
+    DAO dao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        txtLat = (TextView) findViewById(R.id.textview1);
+        //txtLat = (TextView) findViewById(R.id.textview1);
+        btn_StartSession = findViewById(R.id.btn_StartSession);
+        btn_GetSession = findViewById(R.id.btn_GetSession);
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        dao = new DAO(MapsActivity.this);
+
+        // Button onclicklistener
+        btn_StartSession.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date currentTime = Calendar.getInstance().getTime();
+                SessionModel session = new SessionModel(0 ,currentTime.toString());
+
+                boolean succes = dao.addSession(session);
+                Log.d("Debug", "SUCCES = " + succes);
+
+                // Switch to session activity
+
+                startActivity(new Intent(MapsActivity.this, SessionActivity.class));
+            }
+        });
+
+        btn_GetSession.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Debug", dao.getAllSessions().toString());
+            }
+        });
+
+/*        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -63,7 +103,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
                 .findFragmentById(R.id.map);
 
         //Initialize fused location
-        client = LocationServices.getFusedLocationProviderClient(this);
+        client = LocationServices.getFusedLocationProviderClient(this);*/
     }
 
     @SuppressLint("SetTextI18n")
@@ -120,4 +160,5 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
             }
         });
     }
+
 }
