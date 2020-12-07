@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -27,6 +29,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class SessionActivity extends AppCompatActivity implements LocationListener{
 
     SupportMapFragment mapFragment;
@@ -36,36 +41,53 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
 
     TextView txtLat;
 
+    int session_id;
+
+    DAO dao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.session);
+
+        // Get session_id
+
+        Intent intent = getIntent();
+        session_id = intent.getIntExtra("Session_id", 0);
+        Log.d("Session", "Session id = " + session_id);
+
 
         Button btnBack = (Button) findViewById(R.id.btnBack);
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Stop location updates
+                // SessionActivity.this because the LocationListener interface is implemented in this class
+                locationManager.removeUpdates(SessionActivity.this);
                 finish();
             }
         });
 
-        //
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        // Get location
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            Toast.makeText(this, "Not Granted", Toast.LENGTH_SHORT).show();
+
+            // Ask permission from user
+            ActivityCompat.requestPermissions(SessionActivity.this,
+            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
+
+            Locate();
+        } else{
+            // Just locate if permission has been given
+            Locate();
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, (LocationListener) this);
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-
-        //Initialize fused location
-        client = LocationServices.getFusedLocationProviderClient(this);
-
-        //
     }
+
+    // Interface implementation
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -73,8 +95,25 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
         txtLat = (TextView) findViewById(R.id.textview1);
         txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
         PinLocation(location.getLatitude(), location.getLongitude());
-        //PinLocation(50.9, 4.1);
-        Log.d("Debug", "Checked");
+
+        // Create the measurement
+        Date currentTime = Calendar.getInstance().getTime();
+        //DataModel dataModel;
+
+        int heartrate = (int)(Math.random()*((200 - 50) + 1 )) + 50;
+        double pace = (Math.random()*((40 - 10) + 1 )) + 10;
+        double partmat = 7.5;
+
+        // Make DAO object
+        dao = new DAO(SessionActivity.this);
+
+        // Make dataModel and add it to the database
+        DataModel dataModel = new DataModel(0, session_id, heartrate, location.getLongitude(), location.getLatitude(), pace, partmat, currentTime.toString());
+        Log.d("Succes", dataModel.toString());
+
+        boolean succes = dao.addMeasurement(dataModel);
+
+        Log.d("Succes", "Succes = " + succes);
     }
 
     @Override
@@ -90,6 +129,24 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         Log.d("Latitude","status");
+    }
+
+
+
+    // Functions
+
+    // SuppressLint because Permission is already checked before call of this function
+
+    @SuppressLint("MissingPermission")
+    private void Locate(){
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, (LocationListener) this);
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+
+        //Initialize fused location
+        client = LocationServices.getFusedLocationProviderClient(this);
     }
 
     private void PinLocation(final double latitude, final double longitude) {
@@ -121,5 +178,8 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
             }
         });
     }
+
+    //TODO: ADD FUNCTION THAT MOCKS DATA FOR THE MEASUREMENT AND ADD IT TO DATABASE WITH THE RIGHT SESSION ID
+    //TODO: ADD FUNCTION THAT GETS ALL THE MEASUREMENTS AND THEN PLOTS THEM ALL ON THE MAP (FUNCTION IN DAO TO GET AND FUNCTION IN HERE TO PLOT)
 
 }

@@ -6,11 +6,11 @@ public class DataModel {
 
     private int id, session_id, heartrate;
     private double longitude, latitude, pace, partmat;
-    private String date;
+    private String timestamp;
 
     // Constructor
 
-    public DataModel(int id, int session_id, int heartrate, double longitude, double latitude, double pace, double partmat, String date) {
+    public DataModel(int id, int session_id, int heartrate, double longitude, double latitude, double pace, double partmat, String timestamp) {
         this.id = id;
         this.session_id = session_id;
         this.heartrate = heartrate;
@@ -18,7 +18,7 @@ public class DataModel {
         this.latitude = latitude;
         this.pace = pace;
         this.partmat = partmat;
-        this.date = date;
+        this.timestamp = timestamp;
     }
 
     // toString
@@ -33,7 +33,7 @@ public class DataModel {
                 ", latitude=" + latitude +
                 ", pace=" + pace +
                 ", partmat=" + partmat +
-                ", date='" + date + '\'' +
+                ", time='" + timestamp + '\'' +
                 '}';
     }
 
@@ -95,11 +95,11 @@ public class DataModel {
         this.partmat = partmat;
     }
 
-    public String getDate() {
-        return date;
+    public String getTimestamp() {
+        return timestamp;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setTimestamp(String date) {
+        this.timestamp = date;
     }
 }

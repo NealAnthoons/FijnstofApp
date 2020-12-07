@@ -1,10 +1,12 @@
 package com.example.googlemapss;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -43,24 +45,26 @@ public class DAO extends SQLiteOpenHelper {
 
     private static final String SQL_CREATE_TABLE_MEASUREMENT = "CREATE TABLE " + MEASUREMENT_TABLE + " (" +
             COLUMN_MEASUREMENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            COLUMN_LONGITUDE + " INTEGER NOT NULL," +
-            COLUMN_LATITUDE + " INTEGER NOT NULL," +
+            COLUMN_LONGITUDE + " REAL NOT NULL," +
+            COLUMN_LATITUDE + " REAL NOT NULL," +
             COLUMN_PACE + " REAL NOT NULL," +
             COLUMN_HEARTRATE + " INTEGER NOT NULL," +
             COLUMN_PARTMAT + " REAL NOT NULL," +
             COLUMN_TIMESTAMP + " STRING NOT NULL," +
-            COLUMN_SESSION_ID + " INTEGER NOT NULL);";
+            COLUMN_SESSION_ID + " INTEGER NOT NULL," +
+            "FOREIGN KEY (SESSION_ID) REFERENCES SESSION_TABLE(ID));";
 
 
     // default constructor
 
     public DAO(@Nullable Context context) {
-        super(context, "partmat.db", null, 5);
+        super(context, "partmat.db", null, 7);
     }
 
 
     // Create or open database
 
+    @SuppressLint("SQLiteString")
     @Override
     public void onCreate(SQLiteDatabase db) {
 
@@ -75,6 +79,8 @@ public class DAO extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + MEASUREMENT_TABLE);
         onCreate(db);
     }
+
+    // SESSION TABLE CALLS
 
     public boolean addSession(SessionModel sessionModel){
 
@@ -117,7 +123,85 @@ public class DAO extends SQLiteOpenHelper {
                 returnList.add(newSession);
 
             } while (cursor.moveToNext());
-        }else{
+        } else{
+            // do not add anything
+        }
+
+        cursor.close();
+        db.close();
+        return returnList;
+    }
+
+    public int getLastId(){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String QueryString = "SELECT MAX(" + COLUMN_ID + ") FROM " + SESSION_TABLE;
+
+        Cursor cursor = db.rawQuery(QueryString, null);
+
+        cursor.moveToFirst();
+        int id = cursor.getInt(0);
+
+        Log.d("Cursor", "Max id = " + id);
+
+        return id;
+    }
+
+    // MEASUREMENTS TABLE CALLS
+
+    public boolean addMeasurement(DataModel dataModel){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(COLUMN_LONGITUDE, dataModel.getLongitude());
+        cv.put(COLUMN_LATITUDE, dataModel.getLatitude());
+        cv.put(COLUMN_PACE, dataModel.getPace());
+        cv.put(COLUMN_HEARTRATE, dataModel.getHeartrate());
+        cv.put(COLUMN_PARTMAT, dataModel.getPartmat());
+        cv.put(COLUMN_TIMESTAMP, dataModel.getTimestamp());
+        cv.put(COLUMN_SESSION_ID, dataModel.getSession_id());
+
+        // insert returns a long, IF -1 => Unsuccessful insert ELSE successful insert
+        long insert = db.insert(MEASUREMENT_TABLE, null, cv);
+        if (insert == -1){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    public List<DataModel> getMeasurements(int sess){
+
+        List<DataModel> returnList = new ArrayList<>();
+
+        // Get sessions from database
+        String queryString = "SELECT * FROM " + MEASUREMENT_TABLE + " WHERE " + COLUMN_SESSION_ID + "=" + sess;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // rawQuery returns a cursor
+        Cursor cursor = db.rawQuery(queryString, null);
+
+        // See if something is returned
+        if(cursor.moveToFirst()) {
+            // loop through cursor and make an object for each row and put them in the returnList
+            do {
+                int id = cursor.getInt(0);
+                double longitude = cursor.getDouble(1);
+                double latitude = cursor.getDouble(2);
+                double pace = cursor.getDouble(3);
+                int heartrate = cursor.getInt(4);
+                double partmat = cursor.getDouble(5);
+                String timestamp = cursor.getString(6);
+                int session_id = cursor.getInt(7);
+
+                DataModel dataModel = new DataModel(id,session_id,heartrate,longitude,latitude,pace,partmat,timestamp);
+                returnList.add(dataModel);
+
+            } while (cursor.moveToNext());
+        } else{
             // do not add anything
         }
 

@@ -37,7 +37,6 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.Date;
 
-
 public class MapsActivity extends FragmentActivity {
 
     // reference to Button
@@ -70,7 +69,12 @@ public class MapsActivity extends FragmentActivity {
 
                 // Switch to session activity
 
-                startActivity(new Intent(MapsActivity.this, SessionActivity.class));
+                Intent intent = new Intent(MapsActivity.this, SessionActivity.class);
+                // pass through session_id
+                int session_id = dao.getLastId();
+                intent.putExtra("Session_id", session_id);
+
+                startActivity(intent);
             }
         });
 
@@ -78,6 +82,7 @@ public class MapsActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 Log.d("Debug", dao.getAllSessions().toString());
+                //Log.d("Debug", dao.getMeasurements(1).toString());
                 Toast.makeText(MapsActivity.this, dao.getAllSessions().toString(), Toast.LENGTH_LONG).show();
             }
         });
