@@ -5,21 +5,25 @@ public class DataModel {
     // partmat => particulate matter
 
     private int id, session_id, heartrate;
-    private double longitude, latitude, pace, partmat;
+    private double longitude, latitude, partmat1, partmat2, partmat3,  batvolt, batperc;
     private String timestamp;
 
     // Constructor
 
-    public DataModel(int id, int session_id, int heartrate, double longitude, double latitude, double pace, double partmat, String timestamp) {
+    public DataModel(int id, int session_id, int heartrate, double longitude, double latitude, double partmat1, double partmat2, double partmat3, double batvolt, double batperc, String timestamp) {
         this.id = id;
         this.session_id = session_id;
         this.heartrate = heartrate;
         this.longitude = longitude;
         this.latitude = latitude;
-        this.pace = pace;
-        this.partmat = partmat;
+        this.partmat1 = partmat1;
+        this.partmat2 = partmat2;
+        this.partmat3 = partmat3;
+        this.batvolt = batvolt;
+        this.batperc = batperc;
         this.timestamp = timestamp;
     }
+
 
     // toString
 
@@ -31,13 +35,18 @@ public class DataModel {
                 ", heartrate=" + heartrate +
                 ", longitude=" + longitude +
                 ", latitude=" + latitude +
-                ", pace=" + pace +
-                ", partmat=" + partmat +
-                ", time='" + timestamp + '\'' +
+                ", partmat1=" + partmat1 +
+                ", partmat2=" + partmat2 +
+                ", partmat3=" + partmat3 +
+                ", batvolt=" + batvolt +
+                ", batperc=" + batperc +
+                ", timestamp='" + timestamp + '\'' +
                 '}';
     }
 
+
     // getters and setters
+
 
     public int getId() {
         return id;
@@ -79,27 +88,51 @@ public class DataModel {
         this.latitude = latitude;
     }
 
-    public double getPace() {
-        return pace;
+    public double getPartmat1() {
+        return partmat1;
     }
 
-    public void setPace(double pace) {
-        this.pace = pace;
+    public void setPartmat1(double partmat1) {
+        this.partmat1 = partmat1;
     }
 
-    public double getPartmat() {
-        return partmat;
+    public double getPartmat2() {
+        return partmat2;
     }
 
-    public void setPartmat(double partmat) {
-        this.partmat = partmat;
+    public void setPartmat2(double partmat2) {
+        this.partmat2 = partmat2;
+    }
+
+    public double getPartmat3() {
+        return partmat3;
+    }
+
+    public void setPartmat3(double partmat3) {
+        this.partmat3 = partmat3;
+    }
+
+    public double getBatvolt() {
+        return batvolt;
+    }
+
+    public void setBatvolt(double batvolt) {
+        this.batvolt = batvolt;
+    }
+
+    public double getBatperc() {
+        return batperc;
+    }
+
+    public void setBatperc(double batperc) {
+        this.batperc = batperc;
     }
 
     public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String date) {
-        this.timestamp = date;
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 }

@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -57,7 +58,7 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
         Log.d("Session", "Session id = " + session_id);
 
 
-        Button btnBack = (Button) findViewById(R.id.btnBack);
+        MaterialButton btnBack = (MaterialButton) findViewById(R.id.btnBack);
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,13 +103,14 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
 
         int heartrate = (int)(Math.random()*((200 - 50) + 1 )) + 50;
         double pace = (Math.random()*((40 - 10) + 1 )) + 10;
-        double partmat = 7.5;
+        double partmat1 = 2.5, partmat2 = 7.5, partmat3 = 10.0;
+        double batvolt = 12.2, batperc = 100.0;
 
         // Make DAO object
         dao = new DAO(SessionActivity.this);
 
         // Make dataModel and add it to the database
-        DataModel dataModel = new DataModel(0, session_id, heartrate, location.getLongitude(), location.getLatitude(), pace, partmat, currentTime.toString());
+        DataModel dataModel = new DataModel(0, session_id, heartrate, location.getLongitude(), location.getLatitude(), partmat1, partmat2, partmat3, batvolt, batperc, currentTime.toString());
         Log.d("Succes", dataModel.toString());
 
         boolean succes = dao.addMeasurement(dataModel);
@@ -178,8 +180,7 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
             }
         });
     }
-
-    //TODO: ADD FUNCTION THAT MOCKS DATA FOR THE MEASUREMENT AND ADD IT TO DATABASE WITH THE RIGHT SESSION ID
+    
     //TODO: ADD FUNCTION THAT GETS ALL THE MEASUREMENTS AND THEN PLOTS THEM ALL ON THE MAP (FUNCTION IN DAO TO GET AND FUNCTION IN HERE TO PLOT)
 
 }

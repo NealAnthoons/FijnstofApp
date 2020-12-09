@@ -27,11 +27,14 @@ public class DAO extends SQLiteOpenHelper {
     public static final String COLUMN_MEASUREMENT_ID = "MEASUREMENT_ID";
     public static final String COLUMN_LONGITUDE = "LONGITUDE";
     public static final String COLUMN_LATITUDE = "LATITUDE";
-    public static final String COLUMN_PACE = "PACE";
     public static final String COLUMN_HEARTRATE = "HEARTRATE";
-    public static final String COLUMN_PARTMAT = "PARTMAT";
+    public static final String COLUMN_PARTMAT1 = "PARTMAT1";
+    public static final String COLUMN_PARTMAT2 = "PARTMAT2";
+    public static final String COLUMN_PARTMAT3 = "PARTMAT3";
     public static final String COLUMN_TIMESTAMP = "TIMESTAMP";
     public static final String COLUMN_SESSION_ID = "SESSION_ID";
+    public static final String COLUMN_BATVOLT = "BATVOLT";
+    public static final String COLUMN_BATPERC = "BATPERC";
 
 
     // Session table definition
@@ -47,9 +50,12 @@ public class DAO extends SQLiteOpenHelper {
             COLUMN_MEASUREMENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             COLUMN_LONGITUDE + " REAL NOT NULL," +
             COLUMN_LATITUDE + " REAL NOT NULL," +
-            COLUMN_PACE + " REAL NOT NULL," +
             COLUMN_HEARTRATE + " INTEGER NOT NULL," +
-            COLUMN_PARTMAT + " REAL NOT NULL," +
+            COLUMN_PARTMAT1 + " REAL NOT NULL," +
+            COLUMN_PARTMAT2 + " REAL NOT NULL," +
+            COLUMN_PARTMAT3 + " REAL NOT NULL," +
+            COLUMN_BATVOLT + " REAL NOT NULL," +
+            COLUMN_BATPERC + " REAL NOT NULL," +
             COLUMN_TIMESTAMP + " STRING NOT NULL," +
             COLUMN_SESSION_ID + " INTEGER NOT NULL," +
             "FOREIGN KEY (SESSION_ID) REFERENCES SESSION_TABLE(ID));";
@@ -58,7 +64,7 @@ public class DAO extends SQLiteOpenHelper {
     // default constructor
 
     public DAO(@Nullable Context context) {
-        super(context, "partmat.db", null, 7);
+        super(context, "partmat.db", null, 11);
     }
 
 
@@ -132,6 +138,36 @@ public class DAO extends SQLiteOpenHelper {
         return returnList;
     }
 
+    public List<String> getAllSessionNames(){
+        List<String> returnList = new ArrayList<>();
+
+        // Get sessions from database
+        String queryString = "SELECT " + COLUMN_ID + " FROM " + SESSION_TABLE;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // rawQuery returns a cursor
+        Cursor cursor = db.rawQuery(queryString, null);
+
+        // See if something is returned
+        if(cursor.moveToFirst()) {
+            // loop through cursor and make an object for each row and put them in the returnList
+            do {
+                int id = cursor.getInt(0);
+
+                String string = "Session " + id;
+                returnList.add(string);
+
+            } while (cursor.moveToNext());
+        } else{
+            // do not add anything
+        }
+
+        cursor.close();
+        db.close();
+        return returnList;
+    }
+
     public int getLastId(){
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -156,10 +192,13 @@ public class DAO extends SQLiteOpenHelper {
 
         cv.put(COLUMN_LONGITUDE, dataModel.getLongitude());
         cv.put(COLUMN_LATITUDE, dataModel.getLatitude());
-        cv.put(COLUMN_PACE, dataModel.getPace());
         cv.put(COLUMN_HEARTRATE, dataModel.getHeartrate());
-        cv.put(COLUMN_PARTMAT, dataModel.getPartmat());
+        cv.put(COLUMN_PARTMAT1, dataModel.getPartmat1());
+        cv.put(COLUMN_PARTMAT2, dataModel.getPartmat2());
+        cv.put(COLUMN_PARTMAT3, dataModel.getPartmat3());
         cv.put(COLUMN_TIMESTAMP, dataModel.getTimestamp());
+        cv.put(COLUMN_BATPERC, dataModel.getBatperc());
+        cv.put(COLUMN_BATVOLT, dataModel.getBatvolt());
         cv.put(COLUMN_SESSION_ID, dataModel.getSession_id());
 
         // insert returns a long, IF -1 => Unsuccessful insert ELSE successful insert
@@ -191,13 +230,16 @@ public class DAO extends SQLiteOpenHelper {
                 int id = cursor.getInt(0);
                 double longitude = cursor.getDouble(1);
                 double latitude = cursor.getDouble(2);
-                double pace = cursor.getDouble(3);
-                int heartrate = cursor.getInt(4);
-                double partmat = cursor.getDouble(5);
-                String timestamp = cursor.getString(6);
-                int session_id = cursor.getInt(7);
+                int heartrate = cursor.getInt(3);
+                double partmat1 = cursor.getDouble(4);
+                double partmat2 = cursor.getDouble(5);
+                double partmat3 = cursor.getDouble(6);
+                double batvolt = cursor.getDouble(7);
+                double batperc = cursor.getDouble(8);
+                String timestamp = cursor.getString(9);
+                int session_id = cursor.getInt(10);
 
-                DataModel dataModel = new DataModel(id,session_id,heartrate,longitude,latitude,pace,partmat,timestamp);
+                DataModel dataModel = new DataModel(id,session_id,heartrate,longitude,latitude,partmat1, partmat2, partmat3, batvolt, batperc,timestamp);
                 returnList.add(dataModel);
 
             } while (cursor.moveToNext());

@@ -1,20 +1,47 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".MapsActivity" >
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MapsActivity">
 
-<Button
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerInParent="true"
-    android:id="@+id/btn_StartSession"
-    android:text="@string/start"
-    android:onClick="LaunchSession"/>
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-<Button
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/btn_GetSession"
-    android:text="@string/GetSession" />
-</RelativeLayout>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/main_toolbar"
+            app:title="Home"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnStartSession"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="20dp"
+        android:src="@drawable/ic_add"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnGetSession"
+        android:text="@string/GetSession"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_gravity="bottom"/>
+
+    <ListView
+        android:id="@+id/lv_SessionList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="85dp"
+        android:layout_marginTop="?android:attr/actionBarSize" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

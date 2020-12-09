@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GoogleMapss</string>
+    <string name="app_name">GoogleMaps</string>
     <string name="title_activity_maps">Map</string>
     <string name="start">Start</string>
     <string name="GetSession">GET</string>
