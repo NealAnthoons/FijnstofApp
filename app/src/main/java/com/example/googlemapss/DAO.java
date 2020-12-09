@@ -64,7 +64,7 @@ public class DAO extends SQLiteOpenHelper {
     // default constructor
 
     public DAO(@Nullable Context context) {
-        super(context, "partmat.db", null, 11);
+        super(context, "partmat.db", null, 12);
     }
 
 

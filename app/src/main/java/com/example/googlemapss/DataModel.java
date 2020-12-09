@@ -1,6 +1,9 @@
 package com.example.googlemapss;
 
-public class DataModel {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class DataModel{
 
     // partmat => particulate matter
 
@@ -23,7 +26,6 @@ public class DataModel {
         this.batperc = batperc;
         this.timestamp = timestamp;
     }
-
 
     // toString
 

@@ -30,16 +30,20 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.content.Context;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity {
 
@@ -74,7 +78,7 @@ public class MapsActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 Date currentTime = Calendar.getInstance().getTime();
-                SessionModel session = new SessionModel(0 ,currentTime.toString());
+                SessionModel session = new SessionModel(-1 ,currentTime.toString());
 
                 boolean succes = dao.addSession(session);
                 Log.d("Debug", "SUCCES = " + succes);
@@ -103,7 +107,34 @@ public class MapsActivity extends FragmentActivity {
                 lv_SessionList.setAdapter(SessionArrayAdapter);
             }
         });
+
+
+        // LISTVIEW
+
+        lv_SessionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // Initialize list where measurements are put into
+                List<DataModel> MeasurementList;
+
+
+                Intent intent = new Intent(MapsActivity.this, ViewActivity.class);
+                // Get id of clicked session
+                int pos = (int) parent.getItemIdAtPosition(position) + 1;
+                //Pass through the id
+                intent.putExtra("Session_id", pos);
+
+                startActivity(intent);
+
+/*                Log.d("Debug", "Position = " + pos);
+
+                Log.d("Debug", MeasurementList.toString());*/
+            }
+        });
     }
+
+    // FUNCTIONS
 
     private void ShowSessions() {
         SessionArrayAdapter = new ArrayAdapter<String>(MapsActivity.this, android.R.layout.simple_list_item_1, dao.getAllSessionNames());

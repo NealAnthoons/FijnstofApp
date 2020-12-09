@@ -12,8 +12,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +53,13 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.session);
 
+
+        // Keep alive when user locks screen
+        Context mContext = getApplicationContext();
+        PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        final PowerManager.WakeLock wakeLock =  powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"motionDetection:keepAwake");
+        wakeLock.acquire();
+
         // Get session_id
 
         Intent intent = getIntent();
@@ -66,6 +75,7 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
                 // Stop location updates
                 // SessionActivity.this because the LocationListener interface is implemented in this class
                 locationManager.removeUpdates(SessionActivity.this);
+                wakeLock.release();
                 finish();
             }
         });
@@ -182,5 +192,7 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
     }
     
     //TODO: ADD FUNCTION THAT GETS ALL THE MEASUREMENTS AND THEN PLOTS THEM ALL ON THE MAP (FUNCTION IN DAO TO GET AND FUNCTION IN HERE TO PLOT)
+    //TODO: Pas locatie nemen als er iets wordt doorgestuurd (random tijd wachten om door te sturen en daarop wachten)
+    //TODO: Kijk cards op Materialview => optie om hiermee laatste data dat werd doorgestuurd te laten zien tijdens de sessie
 
 }

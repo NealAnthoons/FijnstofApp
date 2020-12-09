@@ -35,7 +35,8 @@
         android:text="@string/GetSession"
         android:layout_marginBottom="20dp"
         android:layout_marginStart="20dp"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom"
+        android:visibility="invisible"/>
 
     <ListView
         android:id="@+id/lv_SessionList"
