@@ -183,6 +183,31 @@ public class DAO extends SQLiteOpenHelper {
         return id;
     }
 
+    public String getDate(int sess){
+
+        String returnString = "";
+
+        // Get timestamp from database
+        String queryString = "SELECT " + COLUMN_DATE + " FROM " + SESSION_TABLE + " WHERE " + COLUMN_ID + "=" + sess;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // rawQuery returns a cursor
+        Cursor cursor = db.rawQuery(queryString, null);
+
+        // See if something is returned
+        if(cursor.moveToFirst()) {
+
+            returnString = cursor.getString(0);
+
+
+        } else{
+            // do not add anything
+        }
+
+        return returnString;
+    }
+
     // MEASUREMENTS TABLE CALLS
 
     public boolean addMeasurement(DataModel dataModel){

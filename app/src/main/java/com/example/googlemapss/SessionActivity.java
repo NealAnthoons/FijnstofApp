@@ -48,10 +48,12 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
 
     DAO dao;
 
+
+    @SuppressLint("WakelockTimeout")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.session);
+        setContentView(R.layout.duringsession);
 
 
         // Keep alive when user locks screen
@@ -103,17 +105,17 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
     @SuppressLint("SetTextI18n")
     @Override
     public void onLocationChanged(Location location) {
-        txtLat = (TextView) findViewById(R.id.textview1);
-        txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
-        PinLocation(location.getLatitude(), location.getLongitude());
+
+        //PinLocation(location.getLatitude(), location.getLongitude());
 
         // Create the measurement
         Date currentTime = Calendar.getInstance().getTime();
         //DataModel dataModel;
 
         int heartrate = (int)(Math.random()*((200 - 50) + 1 )) + 50;
-        double pace = (Math.random()*((40 - 10) + 1 )) + 10;
-        double partmat1 = 2.5, partmat2 = 7.5, partmat3 = 10.0;
+        double partmat1 = (double) (Math.random()*((100) + 1 ));
+        double partmat2 = (double) (Math.random()*((100) + 1 ));
+        double partmat3 = (double) (Math.random()*((100) + 1 ));
         double batvolt = 12.2, batperc = 100.0;
 
         // Make DAO object
@@ -122,6 +124,13 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
         // Make dataModel and add it to the database
         DataModel dataModel = new DataModel(0, session_id, heartrate, location.getLongitude(), location.getLatitude(), partmat1, partmat2, partmat3, batvolt, batperc, currentTime.toString());
         Log.d("Succes", dataModel.toString());
+
+        // set textviews
+
+        SetTexts(dataModel);
+
+
+        //txtHeartrate.setText(heartrate);
 
         boolean succes = dao.addMeasurement(dataModel);
 
@@ -151,7 +160,7 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
 
     @SuppressLint("MissingPermission")
     private void Locate(){
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, (LocationListener) this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, (LocationListener) this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -161,38 +170,32 @@ public class SessionActivity extends AppCompatActivity implements LocationListen
         client = LocationServices.getFusedLocationProviderClient(this);
     }
 
-    private void PinLocation(final double latitude, final double longitude) {
-        //initialize task location
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        Task<Location> task = client.getLastLocation();
-        task.addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(final Location location) {
-                //When succes
-                if (location != null){
-                    mapFragment.getMapAsync(new OnMapReadyCallback() {
-                        @Override
-                        public void onMapReady(GoogleMap googleMap) {
-                            //Initialize lat lng
-                            LatLng latLng = new LatLng(latitude, longitude);
-                            //Create marker options
-                            MarkerOptions options = new MarkerOptions().position(latLng)
-                                    .title(String.valueOf(latLng));
-                            //Zoom map
-                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
-                            // Add marker on map
-                            googleMap.addMarker(options);
-                        }
-                    });
-                }
-            }
-        });
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
+    private void SetTexts(DataModel dataModel){
+
+        // Find Textviews
+
+        TextView txtHeartrate = findViewById(R.id.txtHeartrate);
+        TextView txtFine1 = findViewById(R.id.txtFine1);
+        TextView txtFine2 = findViewById(R.id.txtFine2);
+        TextView txtFine3 = findViewById(R.id.txtFine3);
+        TextView txtLong = findViewById(R.id.txtLong);
+        TextView txtLat = findViewById(R.id.txtLat);
+        TextView txtBat = findViewById(R.id.txtBat);
+        TextView txtTime = findViewById(R.id.txtTime);
+
+        // Set TextViews
+
+        txtHeartrate.setText(Integer.toString(dataModel.getHeartrate()));
+        txtFine1.setText(Integer.toString((int) dataModel.getPartmat1()));
+        txtFine2.setText(Integer.toString((int) dataModel.getPartmat2()));
+        txtFine3.setText(Integer.toString((int) dataModel.getPartmat3()));
+        txtLong.setText(String.format("%,.4f", Double.parseDouble(Double.toString(dataModel.getLongitude()))));
+        txtLat.setText(String.format("%,.4f", Double.parseDouble(Double.toString(dataModel.getLatitude()))));
+        txtBat.setText(Double.toString(dataModel.getBatperc()));
+        txtTime.setText(dataModel.getTimestamp());
     }
-    
-    //TODO: ADD FUNCTION THAT GETS ALL THE MEASUREMENTS AND THEN PLOTS THEM ALL ON THE MAP (FUNCTION IN DAO TO GET AND FUNCTION IN HERE TO PLOT)
+
     //TODO: Pas locatie nemen als er iets wordt doorgestuurd (random tijd wachten om door te sturen en daarop wachten)
-    //TODO: Kijk cards op Materialview => optie om hiermee laatste data dat werd doorgestuurd te laten zien tijdens de sessie
 
 }
